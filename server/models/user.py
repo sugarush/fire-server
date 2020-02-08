@@ -58,16 +58,16 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
 
         async with aiohttp.ClientSession() as session:
 
-            url = f'{os.getenv("FIRE_MAILGUN_URL")}/messages'
+            url = f'{os.getenv("SUGAR_MAILGUN_URL")}/messages'
 
             data = {
-                'from': os.getenv('FIRE_MAILGUN_FROM', 'Fire Server <sugar@server.com>'),
+                'from': os.getenv('SUGAR_MAILGUN_FROM', 'Sugar Server <sugar@server.com>'),
                 'to': [ self.email ],
                 'subject': 'Account Confirmation',
                 'text': f'{hashlib.sha256(self.secret.encode()).hexdigest()}'
             }
 
-            auth = aiohttp.BasicAuth('api', os.getenv('FIRE_MAILGUN_API_KEY'))
+            auth = aiohttp.BasicAuth('api', os.getenv('SUGAR_MAILGUN_API_KEY'))
 
             async with session.request('POST', url, auth=auth, data=data) as response:
                 json = Document(await response.json())
@@ -80,16 +80,16 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
 
         async with aiohttp.ClientSession() as session:
 
-            url = f'{os.getenv("FIRE_MAILGUN_URL")}/messages'
+            url = f'{os.getenv("SUGAR_MAILGUN_URL")}/messages'
 
             data = {
-                'from': os.getenv('FIRE_MAILGUN_FROM', 'Fire Server <sugar@server.com>'),
+                'from': os.getenv('SUGAR_MAILGUN_FROM', 'Sugar Server <sugar@server.com>'),
                 'to': [ self.email ],
                 'subject': 'Account Confirmation',
                 'text': f'A key authorization attempt has failed.'
             }
 
-            auth = aiohttp.BasicAuth('api', os.getenv('FIRE_MAILGUN_API_KEY'))
+            auth = aiohttp.BasicAuth('api', os.getenv('SUGAR_MAILGUN_API_KEY'))
 
             async with session.request('POST', url, auth=auth, data=data) as response:
                 json = Document(await response.json())
