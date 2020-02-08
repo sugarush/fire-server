@@ -76,28 +76,6 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
                 elif not json.message == 'Queued. Thank you.':
                     raise Exception(f'Failed to send confirmation email: {json.message}')
 
-    async def send_authorization_attempt_email(self):
-
-        async with aiohttp.ClientSession() as session:
-
-            url = f'{os.getenv("SUGAR_MAILGUN_URL")}/messages'
-
-            data = {
-                'from': os.getenv('SUGAR_MAILGUN_FROM', 'Sugar Server <sugar@server.com>'),
-                'to': [ self.email ],
-                'subject': 'Account Confirmation',
-                'text': f'A key authorization attempt has failed.'
-            }
-
-            auth = aiohttp.BasicAuth('api', os.getenv('SUGAR_MAILGUN_API_KEY'))
-
-            async with session.request('POST', url, auth=auth, data=data) as response:
-                json = Document(await response.json())
-                if json.message == '\'to\' parameter is not a valid address. please check documentation':
-                    raise Exception('Invalid email address.')
-                elif not json.message == 'Queued. Thank you.':
-                    raise Exception(f'Failed to send confirmation email: {json.message}')
-
     async def on_create(self, token):
 
         if await self.find_one({ 'username': self.username }):

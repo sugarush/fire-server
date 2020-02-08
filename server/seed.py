@@ -14,9 +14,9 @@ async def before_server_start(app, loop):
 
     if not user:
         user = await User.add({
-            'username': os.getenv('FIRE_ADMIN_USERNAME', 'administrator'),
-            'password': os.getenv('FIRE_ADMIN_PASSWORD', 'password'),
-            'email': os.getenv('FIRE_ADMIN_EMAIL', 'paul.severance@gmail.com'),
+            'username': os.getenv('SUGAR_ADMIN_USERNAME', 'administrator'),
+            'password': os.getenv('SUGAR_ADMIN_PASSWORD', 'password'),
+            'email': os.getenv('SUGAR_ADMIN_EMAIL', 'paul.severance@gmail.com'),
             'secret': str(uuid4()),
             'groups': [ 'administrator' ]
         })
