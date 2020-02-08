@@ -5,9 +5,9 @@ from datetime import datetime
 
 import aiohttp
 
-from fire_document import Document
-from fire_odm import MongoDBModel, Field
-from fire_api import JSONAPIMixin, TimestampMixin
+from sugar_document import Document
+from sugar_odm import MongoDBModel, Field
+from sugar_api import JSONAPIMixin, TimestampMixin
 
 
 class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
@@ -40,7 +40,7 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
     }
 
     __database__ = {
-        'name': 'fire-server'
+        'name': 'sugar-server'
     }
 
     username = Field(required=True)
@@ -61,7 +61,7 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
             url = f'{os.getenv("FIRE_MAILGUN_URL")}/messages'
 
             data = {
-                'from': os.getenv('FIRE_MAILGUN_FROM', 'Fire Server <fire@server.com>'),
+                'from': os.getenv('FIRE_MAILGUN_FROM', 'Fire Server <sugar@server.com>'),
                 'to': [ self.email ],
                 'subject': 'Account Confirmation',
                 'text': f'{hashlib.sha256(self.secret.encode()).hexdigest()}'
@@ -83,7 +83,7 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
             url = f'{os.getenv("FIRE_MAILGUN_URL")}/messages'
 
             data = {
-                'from': os.getenv('FIRE_MAILGUN_FROM', 'Fire Server <fire@server.com>'),
+                'from': os.getenv('FIRE_MAILGUN_FROM', 'Fire Server <sugar@server.com>'),
                 'to': [ self.email ],
                 'subject': 'Account Confirmation',
                 'text': f'A key authorization attempt has failed.'

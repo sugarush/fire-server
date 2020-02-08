@@ -1,7 +1,7 @@
 import os
 from uuid import uuid4
 
-from fire_odm import MongoDB
+from sugar_odm import MongoDB
 
 from server import server
 

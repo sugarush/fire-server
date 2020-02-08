@@ -1,7 +1,7 @@
 import hashlib
 from datetime import datetime, timedelta
 
-from fire_api import WebToken
+from sugar_api import WebToken
 
 from models.user import User
 
@@ -34,15 +34,14 @@ class Authentication(WebToken):
             raise Exception('Invalid username and/or password.')
 
         return {
-            'exp': datetime.utcnow() + timedelta(minutes=5),
+            #'exp': datetime.utcnow() + timedelta(minutes=5),
             'nbf': datetime.utcnow(),
             'iat': datetime.utcnow(),
             'data': {
                 'id': user.id,
                 'groups': user.groups,
                 'scope': {
-                    'update-username': user.id,
-                    'update-password': user.id
+                    'elasticsearch.index': 'testing'
                 },
                 'attributes': {
                     'username': user.username
@@ -63,7 +62,7 @@ class Authentication(WebToken):
             raise Exception('User not found for token ID.')
 
         return {
-            'exp': datetime.utcnow() + timedelta(minutes=5),
+            #'exp': datetime.utcnow() + timedelta(minutes=5),
             'nbf': datetime.utcnow(),
             'iat': datetime.utcnow(),
             'data': {
