@@ -1,5 +1,5 @@
-.DS_Store
 .venv
+.DS_Store
 dump.rdb
 __pycache__
 bower_components

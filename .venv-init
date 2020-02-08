@@ -1,1 +1,1 @@
-set -l python_version python3.7
+set -l python_version python3
