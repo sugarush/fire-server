@@ -15,9 +15,9 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
     __rate__ = ( 10, 'secondly' )
 
     __acl__ = {
-        'self': ['read', 'update', 'delete'],
+        'self': ['read', 'update', 'delete', 'subscribe', 'acquire'],
         'administrator': ['all'],
-        'other': ['read'],
+        'other': ['read', 'subscribe'],
         'unauthorized': ['create']
     }
 
@@ -37,11 +37,15 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
         'groups': ['administrator'],
         'secret': [ ],
         'key': ['self'],
+        'created': [ ]
     }
 
-    __database__ = {
-        'name': 'sugar-server'
-    }
+    __index__ = [
+        {
+            'keys': [ ('username', 1), ('email', 1) ]
+        }
+
+    ]
 
     username = Field(required=True)
     password = Field(required=True, validated='validate_password', computed='encrypt_password', validated_before_computed=True)
@@ -50,9 +54,10 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
     secret = Field()
     key = Field(validated='confirm_key')
 
-    groups = Field(type=list, computed=lambda: [ 'users' ], computed_empty=True)
+    groups = Field(type=list, default=lambda: [ 'users' ])
 
-    created = Field(type='timestamp', computed=lambda: datetime.now(), computed_empty=True, computed_type=True)
+    created = Field(type='timestamp', default=lambda: datetime.utcnow(), default_empty=True, default_type=True)
+    accessed = Filed(type='timestamp', default=lambda: datetime.utcnow(), default_type=True)
 
     async def send_confirmation_email(self):
 
@@ -92,7 +97,7 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
         username = attributes.get('username')
         user = await self.find_one({ 'username': username })
         if username and user and not (user.id == self.id):
-            raise Exception(f'Username {username} already exists.')
+            raise Exception(f'Username {username} already taken.')
 
         email = attributes.get('email')
         user = await self.find_one({ 'email': email })
@@ -105,7 +110,7 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
                 await self.send_confirmation_email()
 
         key = attributes.get('key')
-        if key == '$action-resend':
+        if key == '$action-resend-key':
             attributes['key'] = self.key
             await self.send_confirmation_email()
 
