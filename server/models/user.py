@@ -57,7 +57,7 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
     groups = Field(type=list, default=lambda: [ 'users' ])
 
     created = Field(type='timestamp', default=lambda: datetime.utcnow(), default_empty=True, default_type=True)
-    accessed = Filed(type='timestamp', default=lambda: datetime.utcnow(), default_type=True)
+    accessed = Field(type='timestamp', default=lambda: datetime.utcnow(), default_type=True)
 
     async def send_confirmation_email(self):
 
