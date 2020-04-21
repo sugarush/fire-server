@@ -11,8 +11,8 @@ Welcome to Sugar Server's documentation!
    :caption: Contents:
 
    content/basics
-   content/authentication
    content/users
+   content/authentication
    content/variables
 
 
