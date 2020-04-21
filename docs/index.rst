@@ -10,8 +10,10 @@ Welcome to Sugar Server's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   content/modules
-   content/models
+   content/basics
+   content/authentication
+   content/users
+   content/variables
 
 
 Indices and tables

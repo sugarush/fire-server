@@ -16,7 +16,7 @@ async def before_server_start(app, loop):
         user = await User.add({
             'username': os.getenv('SUGAR_ADMIN_USERNAME', 'administrator'),
             'password': os.getenv('SUGAR_ADMIN_PASSWORD', 'password'),
-            'email': os.getenv('SUGAR_ADMIN_EMAIL', 'paul.severance@gmail.com'),
+            'email': os.getenv('SUGAR_ADMIN_EMAIL', 'paul@sugarush.io'),
             'secret': str(uuid4()),
             'groups': [ 'administrator' ]
         })

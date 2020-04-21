@@ -12,10 +12,10 @@ from sugar_api import JSONAPIMixin, TimestampMixin
 
 class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
     '''
-    The default `user` model.
+    A `user` model.
     '''
 
-    __rate__ = ( 10, 'secondly' )
+    __rate__ = ( 5, 'secondly' )
 
     __acl__ = {
         'self': ['read', 'update', 'delete', 'subscribe', 'acquire'],
@@ -31,6 +31,9 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
         'email': ['self', 'administrator'],
         'secret': [ ],
         'key': ['self'],
+        'created': ['self','administrator'],
+        'login': ['self', 'administrator']
+
     }
 
     __set__ = {
@@ -40,59 +43,70 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
         'groups': ['administrator'],
         'secret': [ ],
         'key': ['self'],
-        'created': [ ]
+        'created': [ ],
+        'login': [ ]
     }
 
     __index__ = [
         {
-            'keys': [ ('username', 1), ('email', 1) ]
+            'keys': [ ('username', 1), ('email', 1) ],
+            'options': {
+                'unique': True
+            }
         }
 
     ]
 
     username = Field(required=True)
+    '''
+    The user's `username`.
+    '''
+
     password = Field(required=True, validated='validate_password', computed='encrypt_password', validated_before_computed=True)
+    '''
+    The user's `password`.
+    '''
 
     email = Field(required=True)
-    secret = Field()
-    key = Field(validated='confirm_key')
+    '''
+    The user's `email`.
+    '''
 
-    groups = Field(type=list, default=lambda: [ 'users' ])
+    secret = Field()
+    '''
+    The user's `secret`.
+    '''
+
+    key = Field(validated='confirm_key')
+    '''
+    The user's validation `key`.
+    '''
+
+    groups = Field(type=list, default=lambda: [ 'users' ], default_empty=True)
+    '''
+    A list of `groups` that the user belongs to.
+    '''
 
     created = Field(type='timestamp', default=lambda: datetime.utcnow(), default_empty=True, default_type=True)
-    accessed = Field(type='timestamp', default=lambda: datetime.utcnow(), default_type=True)
+    '''
+    Stores the date the user was created.
+    '''
 
-    async def send_confirmation_email(self):
-        '''
-        Send a confirmation email.
-        '''
+    updated = Field(type='timestamp', default=lambda: datetime.utcnow(), default_type=True)
+    '''
+    Stores when the user was last updated.
+    '''
 
-        async with aiohttp.ClientSession() as session:
-
-            url = f'{os.getenv("SUGAR_MAILGUN_URL")}/messages'
-
-            data = {
-                'from': os.getenv('SUGAR_MAILGUN_FROM', 'Sugar Server <sugar@server.com>'),
-                'to': [ self.email ],
-                'subject': 'Account Confirmation',
-                'text': f'{hashlib.sha256(self.secret.encode()).hexdigest()}'
-            }
-
-            auth = aiohttp.BasicAuth('api', os.getenv('SUGAR_MAILGUN_API_KEY'))
-
-            async with session.request('POST', url, auth=auth, data=data) as response:
-                json = Document(await response.json())
-                if json.message == '\'to\' parameter is not a valid address. please check documentation':
-                    raise Exception('Invalid email address.')
-                elif not json.message == 'Queued. Thank you.':
-                    raise Exception(f'Failed to send confirmation email: {json.message}')
+    login = Field(type='timestamp')
+    '''
+    Stores the user's last login date.
+    '''
 
     async def on_create(self, token):
         '''
         Verify that no existing user has taken the `username` or `email`, then
         generate a `secret` and send a confirmation email.
         '''
-
         if await self.find_one({ 'username': self.username }):
             raise Exception(f'Username {self.username} already exists.')
 
@@ -108,7 +122,6 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
         not, generate a new `secret`, replacing the old one, set the `key` to
         `None` and send a confirmation email.
         '''
-
         username = attributes.get('username')
         user = await self.find_one({ 'username': username })
         if username and user and not (user.id == self.id):
@@ -129,7 +142,9 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
             attributes['key'] = self.key
             await self.send_confirmation_email()
 
-    def validate_password(self, password):
+        self.updated = datetime.utcnow()
+
+    def validate_password(self, value):
         '''
         Used by the `password` field to validate a user's password.
         '''
@@ -155,3 +170,27 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
         if not key == 'None' and key and not \
             (key == hashlib.sha256(self.secret.encode()).hexdigest()):
                 raise Exception('Invalid key.')
+
+    async def send_confirmation_email(self):
+        '''
+        Send a confirmation email.
+        '''
+        async with aiohttp.ClientSession() as session:
+
+            url = f'{os.getenv("SUGAR_MAILGUN_URL")}/messages'
+
+            data = {
+                'from': os.getenv('SUGAR_MAILGUN_FROM', 'Sugar Server <sugar@server.com>'),
+                'to': [ self.email ],
+                'subject': 'Account Confirmation',
+                'text': f'{hashlib.sha256(self.secret.encode()).hexdigest()}'
+            }
+
+            auth = aiohttp.BasicAuth('api', os.getenv('SUGAR_MAILGUN_API_KEY'))
+
+            async with session.request('POST', url, auth=auth, data=data) as response:
+                json = Document(await response.json())
+                if json.message == '\'to\' parameter is not a valid address. please check documentation':
+                    raise Exception('Invalid email address.')
+                elif not json.message == 'Queued. Thank you.':
+                    raise Exception(f'Failed to send confirmation email: {json.message}')

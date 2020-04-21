@@ -11,7 +11,7 @@ WebToken.set_secret('secret')
 
 class Authentication(WebToken):
     '''
-    This class inherits from `sugar_odm.WebToken`.
+    A webtoken based authentication resource.
     '''
 
     @classmethod
@@ -42,8 +42,12 @@ class Authentication(WebToken):
         if not user:
             raise Exception('Invalid username and/or password.')
 
+        user.login = datetime.utcnow()
+
+        await user.save()
+
         return {
-            #'exp': datetime.utcnow() + timedelta(minutes=5),
+            'exp': datetime.utcnow() + timedelta(minutes=5),
             'nbf': datetime.utcnow(),
             'iat': datetime.utcnow(),
             'data': {
@@ -67,7 +71,6 @@ class Authentication(WebToken):
         :param attributes: Attributes supplied with the request.
         :param token: The current token.
         '''
-
         token_data = token.get('data')
         token_id = token_data.get('id')
         token_groups = token_data.get('groups')
@@ -78,7 +81,7 @@ class Authentication(WebToken):
             raise Exception('User not found for token ID.')
 
         return {
-            #'exp': datetime.utcnow() + timedelta(minutes=5),
+            'exp': datetime.utcnow() + timedelta(minutes=5),
             'nbf': datetime.utcnow(),
             'iat': datetime.utcnow(),
             'data': {
