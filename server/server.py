@@ -7,6 +7,9 @@ from sugar_odm import MongoDB
 CORS.set_origins('*')
 
 server = Sanic('application-name')
+'''
+The Sanic server object.
+'''
 
 @server.listener('before_server_start')
 async def before_server_start(app, loop):

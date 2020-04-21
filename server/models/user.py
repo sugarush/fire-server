@@ -11,6 +11,9 @@ from sugar_api import JSONAPIMixin, TimestampMixin
 
 
 class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
+    '''
+    The default `user` model.
+    '''
 
     __rate__ = ( 10, 'secondly' )
 
@@ -49,8 +52,8 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
 
     username = Field(required=True)
     password = Field(required=True, validated='validate_password', computed='encrypt_password', validated_before_computed=True)
-    email = Field(required=True)
 
+    email = Field(required=True)
     secret = Field()
     key = Field(validated='confirm_key')
 
@@ -60,6 +63,9 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
     accessed = Field(type='timestamp', default=lambda: datetime.utcnow(), default_type=True)
 
     async def send_confirmation_email(self):
+        '''
+        Send a confirmation email.
+        '''
 
         async with aiohttp.ClientSession() as session:
 
@@ -82,6 +88,10 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
                     raise Exception(f'Failed to send confirmation email: {json.message}')
 
     async def on_create(self, token):
+        '''
+        Verify that no existing user has taken the `username` or `email`, then
+        generate a `secret` and send a confirmation email.
+        '''
 
         if await self.find_one({ 'username': self.username }):
             raise Exception(f'Username {self.username} already exists.')
@@ -93,6 +103,11 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
         await self.send_confirmation_email()
 
     async def on_update(self, token, attributes):
+        '''
+        Verify that the new `username` and `email` are not already taken. If
+        not, generate a new `secret`, replacing the old one, set the `key` to
+        `None` and send a confirmation email.
+        '''
 
         username = attributes.get('username')
         user = await self.find_one({ 'username': username })
@@ -115,10 +130,16 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
             await self.send_confirmation_email()
 
     def validate_password(self, password):
+        '''
+        Used by the `password` field to validate a user's password.
+        '''
         if len(self.password) < 8:
             raise Exception('Password length must be at least 8 characters.')
 
     def encrypt_password(self):
+        '''
+        Used by the `password` field to encrypt a user's password.
+        '''
         if self.password == 'hashed-':
             raise Exception('Invalid password.')
 
@@ -128,6 +149,9 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
         return f'hashed-{hashlib.sha256(self.password.encode()).hexdigest()}'
 
     def confirm_key(self, key):
+        '''
+        Used by the `key` field to confirm a key.
+        '''
         if not key == 'None' and key and not \
             (key == hashlib.sha256(self.secret.encode()).hexdigest()):
                 raise Exception('Invalid key.')

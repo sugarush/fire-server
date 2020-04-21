@@ -5,3 +5,4 @@ __pycache__
 bower_components
 mongodb_data
 node_modules
+docs/_build

@@ -2,7 +2,14 @@ import os, sys
 import logging
 
 source_id = os.getenv('SUGAR_TIMBER_SOURCE_ID')
+'''
+Provided by the environment variable **SUGAR_TIMBER_SOURCE_ID**.
+'''
+
 api_key = os.getenv('SUGAR_TIMBER_API_KEY')
+'''
+Provided by the environment variable **SUGAR_TIMBER_API_KEY**.
+'''
 
 config = {
     'version': 1,

@@ -6,5 +6,11 @@ from models.user import User
 
 
 server.blueprint(Authentication.resource(url_prefix='/v1'))
+'''
+Blah
+'''
 
 server.blueprint(User.resource(url_prefix='/v1', pubsub=True))
+'''
+Blah
+'''

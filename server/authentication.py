@@ -10,9 +10,18 @@ WebToken.set_secret('secret')
 
 
 class Authentication(WebToken):
+    '''
+    This class inherits from `sugar_odm.WebToken`.
+    '''
 
     @classmethod
     async def create(cls, attributes):
+        '''
+        Given `attributes`, this method returns a `dict` which will be
+        encoded to a `token` by the `sugar_odm.WebToken` class.
+
+        :param attributes: Attributes supplied with the request.
+        '''
         username = attributes.get('username')
 
         if not username:
@@ -51,6 +60,13 @@ class Authentication(WebToken):
 
     @classmethod
     async def refresh(cls, attributes, token):
+        '''
+        Given `attributes` and `token`, returns a `dict` that will be encoded
+        as a `token` by `sugar_odm.WebToken`.
+
+        :param attributes: Attributes supplied with the request.
+        :param token: The current token.
+        '''
 
         token_data = token.get('data')
         token_id = token_data.get('id')
