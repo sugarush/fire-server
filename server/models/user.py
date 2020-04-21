@@ -4,6 +4,7 @@ from uuid import uuid4
 from datetime import datetime
 
 import aiohttp
+from sanic.log import logger
 
 from sugar_document import Document
 from sugar_odm import MongoDBModel, Field
@@ -99,7 +100,7 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
 
     login = Field(type='timestamp')
     '''
-    Stores the user's last login date.
+    Stores when the user last logged in.
     '''
 
     async def on_create(self, token):
@@ -175,18 +176,26 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
         '''
         Send a confirmation email.
         '''
+        url = os.getenv('SUGAR_MAILGUN_URL')
+        key = os.getenv('SUGAR_MAILGUN_API_KEY')
+        sender = os.getenv('SUGAR_MAILGUN_FROM', 'Sugar Server <sugar@server.com>')
+
+        if not (url and key):
+            logger.warn('User.send_confirmation_email: Missing one or more environment variables.')
+            return None
+
         async with aiohttp.ClientSession() as session:
 
-            url = f'{os.getenv("SUGAR_MAILGUN_URL")}/messages'
+            url = f'{url}/messages'
 
             data = {
-                'from': os.getenv('SUGAR_MAILGUN_FROM', 'Sugar Server <sugar@server.com>'),
+                'from': sender,
                 'to': [ self.email ],
                 'subject': 'Account Confirmation',
                 'text': f'{hashlib.sha256(self.secret.encode()).hexdigest()}'
             }
 
-            auth = aiohttp.BasicAuth('api', os.getenv('SUGAR_MAILGUN_API_KEY'))
+            auth = aiohttp.BasicAuth('api', key)
 
             async with session.request('POST', url, auth=auth, data=data) as response:
                 json = Document(await response.json())
