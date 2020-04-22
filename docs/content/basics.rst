@@ -31,3 +31,23 @@ Usage
 To run the server, make sure you are in the `project` directory and run:
 
 ``python server``
+
+After starting the server, you can obtain a `token` by running:
+
+.. code-block:: shell
+
+  curl 'http://localhost:8001/v1/authentication' \
+    --request 'POST' \
+    --header 'Content-Type: application/vnd.api+json' \
+    --header 'Accept: application/vnd.api+json' \
+    --data '{ "data": { "attributes": { "username": "administrator", "password": "password" } } }' \
+
+To use the token to get the first 100 users:
+
+.. code-block:: shell
+
+  curl 'http://localhost:8001/v1/users' \
+    --request 'GET' \
+    --header 'Content-Type: application/vnd.api+json' \
+    --header 'Accept: application/vnd.api+json' \
+    --header 'Authorization: Bearer <your token>'
