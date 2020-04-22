@@ -7,11 +7,11 @@ import aiohttp
 from sanic.log import logger
 
 from sugar_document import Document
-from sugar_odm import MongoDBModel, Field
+from sugar_odm import MemoryModel, Field
 from sugar_api import JSONAPIMixin, TimestampMixin
 
 
-class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
+class User(MemoryModel, JSONAPIMixin, TimestampMixin):
     '''
     A `user` model.
     '''
@@ -48,15 +48,15 @@ class User(MongoDBModel, JSONAPIMixin, TimestampMixin):
         'login': [ ]
     }
 
-    __index__ = [
-        {
-            'keys': [ ('username', 1), ('email', 1) ],
-            'options': {
-                'unique': True
-            }
-        }
-
-    ]
+    #__index__ = [
+    #    {
+    #        'keys': [ ('username', 1), ('email', 1) ],
+    #        'options': {
+    #            'unique': True
+    #        }
+    #    }
+    #
+    #]
 
     username = Field(required=True)
     '''
