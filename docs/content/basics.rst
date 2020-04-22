@@ -11,11 +11,11 @@ Installation
 
 This git repository is a template to be cloned, modified and reused.
 
-``git clone https://github.com/sugarush/sugar-server.git api-server``
+``git clone https://github.com/sugarush/sugar-server.git project``
 
 Change directories to the cloned repository.
 
-``cd api-server``
+``cd project``
 
 Next, install all dependencies.
 
@@ -28,6 +28,6 @@ Now we need to uninstall `ujson`.
 Usage
 -----
 
-To run the server, make sure you are in the cloned repository and run:
+To run the server, make sure you are in the `project` directory and run:
 
 ``python server``
