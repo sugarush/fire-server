@@ -1,11 +1,13 @@
 About
 =====
 
-Sugar Server combines **Sugar ODM**, **Sugar API** and **Sanic** into a fast,
-asynchronous API building environment.
+Sugar Server combines `Sugar ODM <https://sugar-odm.docs.sugarush.io>`_,
+`Sugar API <https://sugar-api.docs.sugarush.io>`_ and
+`Sanic <https://github.com/huge-success/sanic>`_ into a fast, asynchronous
+API building environment.
 
 Installation
-============
+------------
 
 This git repository is a template to be cloned, modified and reused.
 
@@ -24,7 +26,7 @@ Now we need to uninstall `ujson`.
 ``pip uninstall ujson``
 
 Usage
-=====
+-----
 
 To run the server, make sure you are in the cloned repository and run:
 
