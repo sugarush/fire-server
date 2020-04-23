@@ -6,6 +6,12 @@ Sugar Server combines `Sugar ODM <https://sugar-odm.docs.sugarush.io>`_,
 `Sanic <https://github.com/huge-success/sanic>`_ into a fast, asynchronous
 API building environment.
 
+Source
+------
+
+The project's `source <https://gitlab.com/sugarush/sugar-server>`_ is
+available on `GitLab`.
+
 Installation
 ------------
 
