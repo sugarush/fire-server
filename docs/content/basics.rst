@@ -40,7 +40,7 @@ After starting the server, you can obtain a `token` by running:
     --request 'POST' \
     --header 'Content-Type: application/vnd.api+json' \
     --header 'Accept: application/vnd.api+json' \
-    --data '{ "data": { "attributes": { "username": "administrator", "password": "password" } } }' \
+    --data '{ "data": { "attributes": { "username": "administrator", "password": "password" } } }'
 
 To use the token to get the first 100 users:
 
